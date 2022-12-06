@@ -1,6 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const faker = require("faker");
+
+const ProductsService = require("../services/products.service");
+
+const service = new ProductsService();
+
+router.get("/", (req, res) => {
+  const products = service.find();
+  res.json(products);
+});
+
+/* before we used services:
 
 router.get("/", (req, res) => {
   const products = [];
@@ -17,6 +27,7 @@ router.get("/", (req, res) => {
 
   res.json(products);
 });
+*/
 
 // there is an important case to analize:
 
@@ -24,11 +35,23 @@ router.get("/filter", (req, res) => {
   res.send("Im a filter");
 });
 
+router.get(
+  "/:id",
+  (req, res) => {
+    const { id } = req.params; // of all the things inside the params object, we only want the id
+    // a nice detail is that the name of the const should be equal to the params identification
+    //for example, if /products/:productId then: const productId = req.params.productId
+    const product = service.findOne(id);
+    res.json(product);
+  }
+
+  /*Before we used services:
+
 router.get("/:id", (req, res) => {
   const { id } = req.params; // of all the things inside the params object, we only want the id
   // a nice detail is that the name of the const should be equal to the params identification
   //for example, if /products/:productId then: const productId = req.params.productId
-  if (id === '999') {
+  if (id === "999") {
     res.status(404).json({
       message: "not Found",
     });
@@ -40,21 +63,40 @@ router.get("/:id", (req, res) => {
     });
   }
 
-  res.json({
-    id, // in this case, any id inserted will retrieve the same object
-    name: "product2",
-    price: 2000,
-  });
-});
+*/
+);
 
 router.post("/", (req, res) => {
   // inside this archive we already are in LH:3000/api/v1/products !!!
   const body = req.body;
-  res.status(201).json({ //this is how you send an status code
+  const newProduct = service.create(body)
+  res.status(201).json(newProduct);
+});
+
+/* before the service was implemented:
+
+router.post("/", (req, res) => {
+  // inside this archive we already are in LH:3000/api/v1/products !!!
+  const body = req.body;
+  res.status(201).json({
+    //this is how you send an status code
     message: "created",
     data: body,
   });
 });
+
+
+*/
+
+router.patch("/:id", (req, res) => {
+  // you could use put as well in here, but the convention says us that we should use patch for partial information
+  const { id } = req.params;
+  const body = req.body;
+  const product = service.update(id, body);
+  res.json(product);
+});
+
+/* before services are implemented:
 
 router.patch("/:id", (req, res) => {
   // you could use put as well in here, but the convention says us that we should use patch for partial information
@@ -65,7 +107,19 @@ router.patch("/:id", (req, res) => {
     data: body,
     id,
   });
+}); 
+
+*/
+
+router.delete("/:id", (req, res) => {
+  // you could use put as well in here, but the convention says us that we should use patch for partial information
+  const { id } = req.params;
+  const body = req.body;
+  const rta = service.delete(id)
+  res.json(rta);
 });
+
+/* Before changes to services are implemented:
 
 router.delete("/:id", (req, res) => {
   // you could use put as well in here, but the convention says us that we should use patch for partial information
@@ -76,6 +130,8 @@ router.delete("/:id", (req, res) => {
     id,
   });
 });
+
+*/
 
 // we must send codes in every response
 
