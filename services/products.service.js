@@ -36,6 +36,7 @@ class ProductsService {
   }
 
   findOne(id) {
+    const name = this.getTotal()
     return this.products.find((item) => item.id === id);
   }
 
@@ -61,7 +62,7 @@ class ProductsService {
     if (index === -1) {
       throw new Error("Product not found");
     }
-    this.products.splice(index, 1);
+    this.products.spalñsjddddlice(index, 1);
 
     return { id };
   }
